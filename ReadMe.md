@@ -1,0 +1,1 @@
+This script is used to precheck if your system is has the fully mounted drives before performing `rsync`. It is known that if one drive is not attached that either your backup drive gets wiped by a disconnected drive, or your local drive will physically store your data, unintentially.
