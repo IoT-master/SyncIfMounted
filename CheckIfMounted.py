@@ -1,21 +1,43 @@
+from argparse import Action
 import subprocess
-from time import perf_counter
-# import concurrent.futures
-def exist_with_grep(volume_name, my_output):
-    my_bool = any(filter(lambda line: len(line.split(volume_name)) > 1, my_output.split('\n')))
-    return my_bool
+import argparse
+import re
 
-start = perf_counter()
-command = subprocess.check_output('mount', shell=True)
-output_string = command.decode()
+parser = argparse.ArgumentParser(
+    description='Rsync if both source and destination are present')
+parser.add_argument('source', help='path/to/source_folder')
+parser.add_argument('destination', help='path/to/destination_folder')
+parser.add_argument('-z', '--zip_archive_recusive',
+                    help='zip transfer, archived, and recursively transfered', action="store_true")
+parser.add_argument('-d', '--delete_after',
+                    help='delete files if destination is not in source', action="store_true")
+args = parser.parse_args()
 
-mapped_paths = ['/dev/sda', '/dev/sdb']
-mapped_output = [output_string] *len(mapped_paths)
-# with concurrent.futures.ThreadPoolExecutor() as executor:
-#     results = executor.map(exist_with_grep, mapped_paths, mapped_output)
+command_output = subprocess.check_output(
+    'df -h', shell=True).decode().split('\rn')[0].split('\n')[1:-1]
 
-results = list(map(lambda each_path, each_output: exist_with_grep(each_path, each_output), mapped_paths, mapped_output))
-if all(results):
-    subprocess.run('/usr/bin/rsync -zar --delete-after /media/pi/Burtha/ /media/pi/Copycat/ >/dev/null 2>&1', shell=True)
-finished = perf_counter()
-print(f'Finished in {round(finished-start, 5)} second(s)')
+mount_paths = [re.sub(r"\s+", " ", each_line).split()[-1]
+               for each_line in command_output]
+
+print(mount_paths)
+
+check_for_existance = len(list(filter(lambda x: args.source in x, command_output))) == len(
+    list(filter(lambda x: args.destination in x, command_output))) == 1
+
+if check_for_existance:
+    if args.zip_archive_recusive:
+        if args.delete_after:
+            subprocess.run(
+                f'/usr/bin/rsync -zar --delete-after {args.source} {args.destination} >/dev/null 2>&1', shell=True)
+        else:
+            subprocess.run(
+                f'/usr/bin/rsync -zar {args.source} {args.destination} >/dev/null 2>&1', shell=True)
+    else:
+        if args.delete_after:
+            subprocess.run(
+                f'/usr/bin/rsync --delete-after {args.source} {args.destination} >/dev/null 2>&1', shell=True)
+        else:
+            subprocess.run(
+                f'/usr/bin/rsync {args.source} {args.destination} >/dev/null 2>&1', shell=True)
+else:
+    print(parser.print_help())
