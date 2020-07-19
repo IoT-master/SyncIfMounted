@@ -18,12 +18,8 @@ command_output = subprocess.check_output(
 mount_paths = [re.sub(r"\s+", " ", each_line).split()[-1]
                for each_line in command_output]
 
-print(mount_paths)
-
 check_for_existance = len(list(filter(lambda x: x in args.source, mount_paths))) == len(
     list(filter(lambda x: x in args.destination, mount_paths))) == 2
-
-print(check_for_existance)
 
 if check_for_existance:
     if args.zip_archive_recusive:
