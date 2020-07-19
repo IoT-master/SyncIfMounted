@@ -20,8 +20,10 @@ mount_paths = [re.sub(r"\s+", " ", each_line).split()[-1]
 
 print(mount_paths)
 
-check_for_existance = len(list(filter(lambda x: args.source in x, command_output))) == len(
-    list(filter(lambda x: args.destination in x, command_output))) == 1
+check_for_existance = len(list(filter(lambda x: x in args.source, mount_paths))) == len(
+    list(filter(lambda x: x in args.destination, mount_paths))) == 2
+
+print(check_for_existance)
 
 if check_for_existance:
     if args.zip_archive_recusive:
