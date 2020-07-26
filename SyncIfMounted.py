@@ -25,14 +25,14 @@ if check_for_existance:
     if args.zip_archive_recusive:
         if args.delete_after:
             subprocess.run(
-                f'/usr/bin/rsync -zar --delete-after {args.source} {args.destination}', shell=True)
+                f'/usr/bin/rsync -zar --delete-during {args.source} {args.destination}', shell=True)
         else:
             subprocess.run(
                 f'/usr/bin/rsync -zar {args.source} {args.destination}', shell=True)
     else:
         if args.delete_after:
             subprocess.run(
-                f'/usr/bin/rsync --delete-after {args.source} {args.destination}', shell=True)
+                f'/usr/bin/rsync --delete-during {args.source} {args.destination}', shell=True)
         else:
             subprocess.run(
                 f'/usr/bin/rsync {args.source} {args.destination}', shell=True)
