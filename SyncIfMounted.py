@@ -32,9 +32,9 @@ if check_for_existance:
     else:
         if args.delete:
             subprocess.run(
-                f'/usr/bin/rsync --delete-during {args.source} {args.destination}', shell=True)
+                f'/usr/bin/rsync -ar --delete-during {args.source} {args.destination}', shell=True)
         else:
             subprocess.run(
-                f'/usr/bin/rsync {args.source} {args.destination}', shell=True)
+                f'/usr/bin/rsync -ar {args.source} {args.destination}', shell=True)
 else:
     print(parser.print_help())
